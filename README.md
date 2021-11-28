@@ -2,10 +2,12 @@
 - 3700250 Zhaojie LU
 - 3703302 Chengyu Yang
 
-# Présentation de la fonction de projet
+# Details
  -   Une adresse peut créer un compte user
  -   Un user ne peut créer qu'une seule entreprise (Il faut d'abord se connecter à son compte user)
- -   Projet peut être créé à partir de l'interface user ou de l'entreprise. Le nom du projet ne peut pas être répété.  Une fois la création terminée, vous devez revenir à l'interface principale pour rechercher le projet créé. Seuls les membres du projet peuvent utiliser des opérations du projet.
+ -   Projet peut être créé à partir de l'interface user ou de l'entreprise. Le nom du projet ne peut pas être répété.  
+ -   Une fois la création terminée, vous devez revenir à l'interface principale pour rechercher le projet créé.  L'utilisateur peut voir tous les projets qu'il contient et entrer le nom correspondant pour entrer dans l'interface du projet.
+ -   Seuls les membres du projet peuvent utiliser des opérations dans l'interface du projet.
  -   Les membres du projet peuvent créer des tâches de primes. La prime est déduite de leur balance et transférée dans balance du projet.
  -   Lorsque quelqu'un résout cette tâche, prime du projet sera transféré dans le balance de cette personne.
 
