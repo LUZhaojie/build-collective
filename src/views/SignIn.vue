@@ -16,6 +16,12 @@
       </collective-button>
     </card>
     <spacer :size="24" />
+    <card title="Project Search!" :blue="true">
+      <collective-button :transparent="true" @click="goToProject">
+        Go to Search
+      </collective-button>
+    </card>
+    <spacer :size="24" />
     <div class="home">
       <card
         v-for="(link, index) in links"
@@ -74,6 +80,9 @@ export default defineComponent({
   methods: {
     goToAccount() {
       this.$router.push({ name: 'Account' })
+    },
+    goToProject() {
+      this.$router.push({ name: 'Projectview' })
     },
   },
 })

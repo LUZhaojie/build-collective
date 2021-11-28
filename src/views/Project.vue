@@ -1,61 +1,81 @@
 <template lang="html">
-  <div class="home" v-if="!account">
-    <form @submit.prevent="signUp">
+  <div class="home" v-if="!project">
+    <form>
       <card
-        title="Enter your username here"
-        subtitle="Type directly in the input and hit enter. All spaces will be converted to _"
+          title="Project"
       >
+        <span class="input-username">Name</span>
         <input
-          type="text"
-          class="input-username"
-          v-model="username"
-          placeholder="Type your username here"
+            type="text"
+            class="input-username"
+            v-model="projectName"
+            placeholder="Type your ProjectName here"
         />
+
+        <span class="input-username">Link</span>
+        <input
+            type="text"
+            class="input-username"
+            v-model="link"
+            placeholder="Type here"
+        />
+
       </card>
-    </form>
-  </div>
-  <div class="home" v-if="account">
-    <div class="card-home-wrapper">
-      <card
-        :title="account.username"
-        :subtitle="`Balance: ${balance} ETH  \t\t Tokens: ${account.balance}  \t\t Address: ${account.adr} `"
-        :gradient="true"
-      >
-
-        <div class="explanations">
-
-          On your account on the contract, you have
-          {{ account.balance }} tokens. If you click
-          <button class="button-link" @click="addTokens">here</button>, you can
-          add 200 token to your account. <p>If you want create a project with tokens, you need to have enough tokens in your account.</p>
+      <spacer :size="24" />
+      <card title="Choose one or multiple contibutors ">
+        <div v-for="items in userlist" v-bind:key="items.adr" class="input-username">
+          <input type="checkbox"  :id= "items.adr" :value="items.adr" v-model="contributorsforsign" >
+          <label>{{items.username}}</label>
         </div>
       </card>
       <spacer :size="24" />
-      <div class="explanations" v-if="!entrepriseAccount">
-      <card title="Create a Entreprise Account"  :blue="true">
-        <collective-button :transparent="true" @click="goToEntreprise">
-          Go to Create!
-        </collective-button>
+      <card
+          title="Add tokens for your project"
+      >
+        <input
+            type="number"
+            class="input-username"
+            v-model="projectbalanceforsign"
+            placeholder="Type your tokens here"
+        />
+      </card>
+    </form>
+    <spacer :size="24" />
+    <card title="Create your Project"  :blue="true">
+      <collective-button :transparent="true" @click="projectSignUP">
+        Create!
+      </collective-button>
+    </card>
+  </div>
+
+  <div class="home" v-else>
+    <div class="card-home-wrapper">
+    <card
+        title="Created!"
+        :blue="true"
+        :subtitle="`Project Name: ${project.name} `"
+        >
       </card>
       </div>
 
-      <div class="explanations">
-        <card title="Create a Project"  :blue="true">
-          <collective-button :transparent="true" @click="goToProject">
-            Go to Create!
-          </collective-button>
-        </card>
-      </div>
 
-      <div class="explanations" v-if="entrepriseAccount">
-        <card title="Go your Entreprise Account"  :blue="true">
-          <collective-button :transparent="true" @click="goToEntreprise">
-            Go to Entreprise Account!
-          </collective-button>
-        </card>
-      </div>
-    </div>
   </div>
+<!--  <span> address : {{ address }}</span>-->
+<!--  <span> created : {{ created }}</span>-->
+<!--  <span> projectName : {{ projectName }}</span>-->
+<!--  <span> account : {{ account }}</span>-->
+<!--  <span> username : {{ username }}</span>-->
+<!--  <span> entrepriseAccount : {{ entrepriseAccount }}</span>-->
+<!--  <span> entrepriseName : {{ entrepriseName }}</span>-->
+<!--  <span> projectbalanceforsign : {{ projectbalanceforsign }}</span>-->
+<!--  <span> userlist : {{ userlist }}</span>-->
+<!--  <span> entrepriseMembers: {{ entrepriseMembers }}</span>-->
+<!--  <span> entrepriseMembersAddresses : {{ entrepriseMembersAddresses }}</span>-->
+<!--  <span> contributorsforsign : {{ contributorsforsign }}</span>-->
+<!--  <span> project : {{ project }}</span>-->
+
+
+
 </template>
 
 <script lang="ts">
@@ -77,21 +97,22 @@ export default defineComponent({
   data() {
     const account = null
     const username = ''
+    const projectName = ''
+    const created = false
+    const contributorsforsign: any[] = []
+    const projectbalanceforsign = 0
+    const project = null
     const entrepriseAccount = null
     const entrepriseName = ''
-    const entreprisebalance = 0
     const userlist : any[] = []
     const entrepriseMembers: any[] = []
     const entrepriseMembersAddresses : any[] = []
-    const entrepriseMembersforSign : any[] = []
-    return { account, username, entrepriseAccount,entrepriseName,entreprisebalance,userlist,entrepriseMembers,entrepriseMembersAddresses,entrepriseMembersforSign}
+    const link = ''
+    return { account, username,link,projectName,project,created,contributorsforsign,entrepriseAccount,entrepriseName,projectbalanceforsign,userlist,entrepriseMembers,entrepriseMembersAddresses}
   },
   methods: {
     goToEntreprise() {
       this.$router.push({ name: 'Entreprise' })
-    },
-    goToProject() {
-      this.$router.push({ name: 'Project' })
     },
     async updateAccount() {
       const { address, contract } = this
@@ -99,8 +120,12 @@ export default defineComponent({
     },
     async updateEntrepriseAccount(){
       const { address, contract } = this
-      this.entrepriseAccount = await contract.methods.entreprises(address).call()
-
+      this.project = await contract.methods.entreprises(address).call()
+    },
+    async updateProject(){
+      const { address, projectName ,contract } = this
+      const n = projectName.trim().replace(/ /g, '_')
+      this.project = await contract.methods.project(n).call()
     },
     async signUp() {
       const { contract, username } = this
@@ -114,19 +139,14 @@ export default defineComponent({
       await contract.methods.addBalance(200).send()
       await this.updateAccount()
     },
-    async EntrepriseSignUP(){
-      const {contract, entrepriseName,entrepriseMembersforSign} = this
-      const name = entrepriseName.trim().replace(/ /g, '_')
-      await contract.methods.entrepriseSignUP(name,entrepriseMembersforSign).send()
-      await this.updateEntrepriseAccount()
-      await this.goToEntreprise()
-    },
-    async addBalanceToEntreprise(){
-      const {contract,entreprisebalance} = this
-      await contract.methods.addBalanceToEntreprise(entreprisebalance).send()
-      await this.updateEntrepriseAccount()
-      await this.goToEntreprise()
-    },
+    async projectSignUP(){
+      const {contract,projectName,projectbalanceforsign,contributorsforsign,link} = this
+      const Pname = projectName.trim().replace(/ /g, '_')
+      await contract.methods.projectSignUP(Pname,contributorsforsign,projectbalanceforsign,link).send()
+      // this.project = await contract.methods.project(Pname);
+      await this.updateProject()
+      this.created = false;
+    }
   },
   async mounted() {
     const { address, contract } = this
@@ -192,17 +212,6 @@ export default defineComponent({
   color: white;
   font-family: inherit;
   font-size: 1.3rem;
-}
-.card-body {
-  padding: 12px;
-  display: block;
-  font-family: inherit;
-  font-size: 1.2rem;
-  font-weight: inherit;
-  text-align: center;
-  color: inherit;
-  text-decoration: none;
-  font-variant: small-caps;
 }
 
 </style>

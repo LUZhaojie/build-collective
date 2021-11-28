@@ -1,59 +1,81 @@
 <template lang="html">
-  <div class="home" v-if="!account">
-    <form @submit.prevent="signUp">
+  <div class="home" v-if="!entrepriseAccount">
+    <form>
       <card
-        title="Enter your username here"
-        subtitle="Type directly in the input and hit enter. All spaces will be converted to _"
+        title="Enter EntrepriseAccount name "
       >
         <input
           type="text"
           class="input-username"
-          v-model="username"
-          placeholder="Type your username here"
+          v-model="entrepriseName"
+          placeholder="Type your EntrepriseName here"
         />
       </card>
+      <spacer :size="24" />
+      <card title="Choose one or multiple members ">
+        <div v-for="items in userlist" v-bind:key="items.adr" class="input-username">
+          <input type="checkbox"  :id= "items.adr" :value="items.adr" v-model="entrepriseMembersforSign" >
+          <label>{{items.username}}</label>
+        </div>
+<!--        <span>entrepriseMembersforSign: {{ entrepriseMembersforSign }}</span>-->
+<!--        <span>userlist: {{ userlist }}</span>-->
+<!--        <span>entrepriseName: {{ entrepriseName }}</span>-->
+      </card>
     </form>
+    <spacer :size="24" />
+    <card title="Create your Entreprise Account"  :blue="true">
+      <collective-button :transparent="true" @click="EntrepriseSignUP">
+        Create!
+      </collective-button>
+    </card>
   </div>
-  <div class="home" v-if="account">
+
+
+  <div class="home" v-else>
     <div class="card-home-wrapper">
       <card
-        :title="account.username"
-        :subtitle="`Balance: ${balance} ETH  \t\t Tokens: ${account.balance}  \t\t Address: ${account.adr} `"
+        :title="'Entreprise Account'"
         :gradient="true"
       >
-
         <div class="explanations">
+          <p><b>Name of Entreprise: </b>{{ entrepriseAccount.name }}</p>
+          <p><b>Owner: </b>{{ entrepriseAccount.owner.username }}</p>
+          <p><b>Members: </b></p>
 
-          On your account on the contract, you have
-          {{ account.balance }} tokens. If you click
-          <button class="button-link" @click="addTokens">here</button>, you can
-          add 200 token to your account. <p>If you want create a project with tokens, you need to have enough tokens in your account.</p>
+            <span
+                v-for="member in entrepriseMembers"
+                v-bind:key="member.adr"
+            >
+            <p>{{ member.username }} -> {{ member.adr }}</p>
+          </span>
+          <p><b>Balance: </b>{{ entrepriseAccount.balance }} Tokens</p>
+<!--        <span>entrepriseMembers: {{ entrepriseMembers }}</span>-->
+<!--          <span>entrepriseMembersAddresses: {{ entrepriseMembersAddresses }}</span>-->
+<!--          <p><b>entrepriseAccount: </b>{{ entrepriseAccount}}</p>-->
         </div>
       </card>
       <spacer :size="24" />
-      <div class="explanations" v-if="!entrepriseAccount">
-      <card title="Create a Entreprise Account"  :blue="true">
-        <collective-button :transparent="true" @click="goToEntreprise">
+      <form @submit.prevent="addBalanceToEntreprise">
+        <card
+            title="Add tokens for your Entreprise Account"
+            subtitle="After Addition  please F5"
+        >
+          <input
+              type="number"
+              class="input-username"
+              v-model="entreprisebalance"
+              placeholder="Type your tokens here"
+          />
+        </card>
+      </form>
+    </div>
+    <spacer :size="24" />
+    <div class="explanations">
+      <card title="Create a Project"  :blue="true">
+        <collective-button :transparent="true" @click="goToProject">
           Go to Create!
         </collective-button>
       </card>
-      </div>
-
-      <div class="explanations">
-        <card title="Create a Project"  :blue="true">
-          <collective-button :transparent="true" @click="goToProject">
-            Go to Create!
-          </collective-button>
-        </card>
-      </div>
-
-      <div class="explanations" v-if="entrepriseAccount">
-        <card title="Go your Entreprise Account"  :blue="true">
-          <collective-button :transparent="true" @click="goToEntreprise">
-            Go to Entreprise Account!
-          </collective-button>
-        </card>
-      </div>
     </div>
   </div>
 </template>
@@ -99,7 +121,7 @@ export default defineComponent({
     },
     async updateEntrepriseAccount(){
       const { address, contract } = this
-      this.entrepriseAccount = await contract.methods.entreprises(address).call()
+      this.entrepriseAccount = await contract.methods.entreprise(address).call()
 
     },
     async signUp() {
@@ -140,15 +162,15 @@ export default defineComponent({
     const entrepriseAccount = await contract.methods.entreprise(address).call()
     if (account.registered) this.account = account
     if (entrepriseAccount.registered) {
-      this.entrepriseAccount = entrepriseAccount
-      const entrepriseMembersAddresses = await contract.methods.member(entrepriseAccount.name).call()
-      this.entrepriseMembersAddresses = entrepriseMembersAddresses
-      this.entrepriseMembers = []
-      for (const memberAdresse of entrepriseMembersAddresses) {
-        const account = await contract.methods.user(memberAdresse).call()
-        this.entrepriseMembers.push(account)
-      }
-    }
+        this.entrepriseAccount = entrepriseAccount
+        const entrepriseMembersAddresses = await contract.methods.member(entrepriseAccount.name).call()
+        this.entrepriseMembersAddresses = entrepriseMembersAddresses
+        this.entrepriseMembers = []
+        for (const memberAdresse of entrepriseMembersAddresses) {
+            const account = await contract.methods.user(memberAdresse).call()
+            this.entrepriseMembers.push(account)
+        }
+        }
   },
 })
 </script>
@@ -192,17 +214,6 @@ export default defineComponent({
   color: white;
   font-family: inherit;
   font-size: 1.3rem;
-}
-.card-body {
-  padding: 12px;
-  display: block;
-  font-family: inherit;
-  font-size: 1.2rem;
-  font-weight: inherit;
-  text-align: center;
-  color: inherit;
-  text-decoration: none;
-  font-variant: small-caps;
 }
 
 </style>
