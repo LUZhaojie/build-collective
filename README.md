@@ -1,3 +1,10 @@
+# Team Member
+3700250 Zhaojie LU
+3703302 Chengyu Yang
+
+# Présentation de la fonction de projet
+
+
 # Build Collective
 
 Welcome to the DAAR project. The idea will be to implement an OpenCollective competitor
