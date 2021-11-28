@@ -1,9 +1,11 @@
 # Team Member
-3700250 Zhaojie LU
-3703302 Chengyu Yang
+- 3700250 Zhaojie LU
+- 3703302 Chengyu Yang
 
 # Présentation de la fonction de projet
-
+ -   Une adresse peut créer un user
+ -   Un user ne peut créer qu'une seule entreprise
+ -   Peut être créé à partir de l'interface user ou de l'entreprise Le nom du projet ne peut pas être répété
 
 # Build Collective
 
